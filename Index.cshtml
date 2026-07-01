@@ -1,0 +1,79 @@
+@model IEnumerable<AIStudyPlanner.Models.StudyPlan>
+@{
+    ViewData["Title"] = "Engine Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card status-card p-3 shadow-sm text-center border-0 bg-primary text-white">
+                <h6>Completion Rate</h6>
+                <h2 class="fw-bold">@ViewBag.CompletionRate%</h2>
+                <div class="progress bg-white bg-opacity-25 mt-2" style="height: 6px;">
+                    <div class="progress-bar bg-white" style="width: @ViewBag.CompletionRate%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card p-3 shadow-sm text-center border-0 bg-success text-white">
+                <h6>Completed Tasks</h6>
+                <h2 class="fw-bold">@ViewBag.CompletedTasks</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card p-3 shadow-sm text-center border-0 bg-warning text-dark">
+                <h6>Active Targets</h6>
+                <h2 class="fw-bold">@ViewBag.RemainingTasks</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card status-card p-3 shadow-sm text-center border-0 bg-info text-white">
+                <h6>Total Pipelines</h6>
+                <h2 class="fw-bold">@ViewBag.TotalTasks</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <h3 class="mb-3 text-gradient fw-bold">Active Tracks</h3>
+            @foreach (var plan in Model)
+            {
+                <div class="card mb-4 border-0 shadow-sm custom-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="card-title text-primary font-weight-bold">@plan.Subject</h4>
+                            <span class="badge bg-secondary">@plan.SkillLevel</span>
+                        </div>
+                        <p class="text-muted small">Target Velocity: @plan.StudyHoursPerDay Hrs/day until @plan.TargetCompletionDate.ToString("MM/dd/yyyy")</p>
+
+                        <div class="task-list mt-3">
+                            <h6>Engine-Generated Checkpoints:</h6>
+                            @foreach (var task in plan.StudyTasks.OrderBy(t => t.ScheduledDate).Take(5))
+                            {
+                                <div class="form-check d-flex align-items-center py-2 border-bottom generic-task @(task.IsRevisionDay ? "bg-light-revision p-2 rounded" : "")">
+                                    <input class="form-check-input me-3 task-toggle-checkbox" type="checkbox" data-id="@task.Id" @(task.IsCompleted ? "checked" : "")>
+                                    <label class="form-check-label @(task.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                                        <strong>@task.ScheduledDate.ToString("MMM dd"):</strong> @task.Title 
+                                        @if(task.IsRevisionDay){ <span class="badge bg-danger ms-2">Break & Sync</span> }
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 bg-dark text-white p-4 text-center mb-4">
+                <h4 class="mb-3 text-warning fw-bold">🍅 Pomodoro Control Block</h4>
+                <div class="display-3 fw-bold my-2" id="timer-display">25:00</div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-light btn-sm px-4 mx-1" id="btn-timer-start">Run</button>
+                    <button class="btn btn-outline-danger btn-sm px-4 mx-1" id="btn-timer-reset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
